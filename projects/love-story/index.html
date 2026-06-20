@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Love Story ✨</title>
+    <meta name="description" content="Interactive love story experience for Rahul & Rohan">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .scene {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 60px 40px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.3),
+                0 0 100px rgba(255, 107, 157, 0.3),
+                inset 0 0 60px rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .card {
+            display: none;
+        }
+
+        .card.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 
+                0 0 20px rgba(255, 107, 157, 0.8),
+                0 0 40px rgba(255, 107, 157, 0.4);
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 20px rgba(255, 107, 157, 0.8), 0 0 40px rgba(255, 107, 157, 0.4); }
+            100% { text-shadow: 0 0 30px rgba(255, 107, 157, 1), 0 0 60px rgba(255, 107, 157, 0.6); }
+        }
+
+        .heart-icon {
+            display: inline-block;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .question {
+            font-size: 1.8rem;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 18px 50px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            z-index: 100;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff8a80 100%);
+            color: white;
+            box-shadow: 
+                0 10px 30px rgba(255, 107, 157, 0.4),
+                0 0 20px rgba(255, 107, 157, 0.2);
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 
+                0 10px 30px rgba(102, 126, 234, 0.4),
+                0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(255, 107, 157, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: left 0.5s;
+            pointer-events: none;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .present-box {
+            width: 200px;
+            height: 200px;
+            margin: 40px auto;
+            position: relative;
+            cursor: pointer;
+            animation: presentFloat 3s ease-in-out infinite;
+            z-index: 50;
+            touch-action: manipulation;
+        }
+
+        @keyframes presentFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .present-box:hover {
+            animation: presentShake 0.5s ease-in-out infinite;
+        }
+
+        @keyframes presentShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .present-face {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff8a80 100%);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .ribbon {
+            position: absolute;
+            background: linear-gradient(90deg, #ffd700, #ffed4a);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .ribbon-v {
+            width: 20px;
+            height: 200px;
+            left: 90px;
+            top: 0;
+        }
+
+        .ribbon-h {
+            width: 200px;
+            height: 20px;
+            top: 90px;
+            left: 0;
+        }
+
+        .surprise-content {
+            display: none;
+            text-align: center;
+            animation: surpriseReveal 0.5s ease-out;
+        }
+
+        @keyframes surpriseReveal {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .surprise-content.active {
+            display: block;
+        }
+
+        .surprise-emoji {
+            font-size: 5rem;
+            animation: emojiBounce 1s ease-in-out infinite;
+        }
+
+        @keyframes emojiBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.1); }
+        }
+
+        .surprise-text {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-top: 20px;
+            text-shadow: 0 0 20px rgba(255, 107, 157, 0.8);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b9d, #ff8a80, #ffd700);
+            border-radius: 10px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
+        }
+
+        .couple-names {
+            font-size: 2.5rem;
+            color: #fff;
+            text-align: center;
+            margin: 30px 0;
+            text-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
+            animation: namesGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes namesGlow {
+            0% { text-shadow: 0 0 30px rgba(255, 107, 157, 0.8); }
+            100% { text-shadow: 0 0 50px rgba(255, 107, 157, 1), 0 0 80px rgba(255, 107, 157, 0.5); }
+        }
+
+        .heart-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .heart-divider::before,
+        .heart-divider::after {
+            content: '';
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 107, 157, 0.8), transparent);
+        }
+
+        .final-message {
+            font-size: 2rem;
+            color: #fff;
+            text-align: center;
+            line-height: 1.8;
+            animation: finalFadeIn 1s ease-out;
+        }
+
+        @keyframes finalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .restart-btn {
+            margin-top: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .floating-hearts {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .floating-heart {
+            position: absolute;
+            font-size: 2rem;
+            animation: floatHeart 4s ease-in-out infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes floatHeart {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateY(-100px) rotate(180deg);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .question { font-size: 1.4rem; }
+            .btn { padding: 15px 35px; font-size: 1.1rem; }
+            .card { padding: 40px 25px; }
+            .present-box { width: 150px; height: 150px; }
+            .present-face { width: 150px; height: 150px; }
+            .ribbon-v { width: 15px; height: 150px; left: 67.5px; }
+            .ribbon-h { width: 150px; height: 15px; top: 67.5px; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 2rem; }
+            .question { font-size: 1.2rem; }
+            .btn { padding: 12px 25px; font-size: 1rem; }
+            .card { padding: 30px 20px; }
+            .options { flex-direction: column; gap: 15px; }
+            .btn { width: 100%; max-width: 280px; }
+        }
+
+        @media (min-width: 1440px) {
+            .card { padding: 80px 60px; }
+            h1 { font-size: 4rem; }
+            .question { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles-canvas"></canvas>
+    
+    <div class="floating-hearts" id="floating-hearts"></div>
+    
+    <div class="container">
+        <div class="scene">
+            <div class="card active" id="card-0">
+                <h1><span class="heart-icon">💕</span> Love Story <span class="heart-icon">💕</span></h1>
+                <p class="question">Welcome to our magical journey together!</p>
+                <p class="question" style="font-size: 1.3rem; margin-top: -20px;">Rahul forever 💕</p>
+                <div class="options">
+                    <button class="btn btn-yes" onclick="startStory()">Begin Our Story ✨</button>
+                </div>
+            </div>
+
+            <div class="card" id="card-1">
+                <h1><span class="heart-icon">💖</span> Question 1 <span class="heart-icon">💖</span></h1>
+                <p class="question" id="question-1">Do you believe in love at first sight?</p>
+                <div class="options">
+                    <button class="btn btn-yes" onclick="answerQuestion(1, true)">Yes 💕</button>
+                    <button class="btn btn-no" onclick="answerQuestion(1, false)">No 💔</button>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 20%"></div>
+                </div>
+            </div>
+
+            <div class="card" id="card-2">
+                <h1><span class="heart-icon">💝</span> Surprise! <span class="heart-icon">💝</span></h1>
+                <div class="present-box" id="present-1" onclick="openPresent(1)">
+                    <div class="present-face">
+                        <div class="ribbon ribbon-v"></div>
+                        <div class="ribbon ribbon-h"></div>
+                        🎁
+                    </div>
+                </div>
+                <p class="question">Click the present to open! 🎁</p>
+                <div class="surprise-content" id="surprise-1">
+                    <div class="surprise-emoji">🌹</div>
+                    <p class="surprise-text">A beautiful rose for my beautiful love!</p>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 40%"></div>
+                </div>
+            </div>
+
+            <div class="card" id="card-3">
+                <h1><span class="heart-icon">💗</span> Question 2 <span class="heart-icon">💗</span></h1>
+                <p class="question" id="question-2">Would you travel the world with me?</p>
+                <div class="options">
+                    <button class="btn btn-yes" onclick="answerQuestion(2, true)">Yes ✈️</button>
+                    <button class="btn btn-no" onclick="answerQuestion(2, false)">No 🏠</button>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 60%"></div>
+                </div>
+            </div>
+
+            <div class="card" id="card-4">
+                <h1><span class="heart-icon">💞</span> Another Surprise! <span class="heart-icon">💞</span></h1>
+                <div class="present-box" id="present-2" onclick="openPresent(2)">
+                    <div class="present-face">
+                        <div class="ribbon ribbon-v"></div>
+                        <div class="ribbon ribbon-h"></div>
+                        🎁
+                    </div>
+                </div>
+                <p class="question">Open this special gift! 🎀</p>
+                <div class="surprise-content" id="surprise-2">
+                    <div class="surprise-emoji">💍</div>
+                    <p class="surprise-text">My heart is forever yours!</p>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 80%"></div>
+                </div>
+            </div>
+
+            <div class="card" id="card-5">
+                <h1><span class="heart-icon">💕</span> Question 3 <span class="heart-icon">💕</span></h1>
+                <p class="question" id="question-3">Will you be mine forever?</p>
+                <div class="options">
+                    <button class="btn btn-yes" onclick="answerQuestion(3, true)">Yes Forever! 💖</button>
+                    <button class="btn btn-no" onclick="answerQuestion(3, false)">Maybe... 🤔</button>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <div class="card" id="card-6">
+                <h1><span class="heart-icon">💖</span> Forever & Always <span class="heart-icon">💖</span></h1>
+                <div class="couple-names">
+                    <span class="heart-icon">💕</span> Rahul <span class="heart-icon">&</span> Arya <span class="heart-icon">💕</span>
+                </div>
+                <div class="heart-divider">
+                    <span class="heart-icon">❤️</span>
+                </div>
+                <p class="final-message">
+                    Every moment with you is a treasure.<br>
+                    Every smile from you is a blessing.<br>
+                    Every day with you is an adventure.<br>
+                    <br>
+                    <strong>I love you more than words can say! 💕</strong>
+                </p>
+                <div class="present-box" id="present-final" onclick="openPresent(3)">
+                    <div class="present-face">
+                        <div class="ribbon ribbon-v"></div>
+                        <div class="ribbon ribbon-h"></div>
+                        🎁
+                    </div>
+                </div>
+                <p class="question">One final surprise! 🎁</p>
+                <div class="surprise-content" id="surprise-3">
+                    <div class="surprise-emoji">🏆</div>
+                    <p class="surprise-text">You're my greatest prize! 🏆</p>
+                </div>
+                <div class="options">
+                    <button class="btn restart-btn" onclick="restartStory()">Experience Again 🔄</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Particle System - Optimized
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationId;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 10;
+                this.size = Math.random() * 12 + 4;
+                this.speedY = Math.random() * 1.5 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.4 + 0.2;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = (Math.random() - 0.5) * 1.5;
+                this.heartType = Math.random() > 0.5 ? '❤️' : '💕';
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX;
+                this.rotation += this.rotationSpeed;
+
+                if (this.y < -50) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                ctx.globalAlpha = this.opacity;
+                ctx.font = this.size + 'px Arial';
+                ctx.fillText(this.heartType, -this.size / 2, this.size / 2);
+                ctx.restore();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 30; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            animationId = requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        // Floating Hearts Background - Optimized
+        function createFloatingHearts() {
+            const container = document.getElementById('floating-hearts');
+            const hearts = ['❤️', '💕', '💖', '💗', '💝', '💞'];
+            
+            for (let i = 0; i < 10; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.top = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 4 + 's';
+                heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                container.appendChild(heart);
+            }
+        }
+
+        createFloatingHearts();
+
+        // Story Flow
+        let currentCard = 0;
+
+        function startStory() {
+            showCard(1);
+            createBurst();
+        }
+
+        function showCard(cardIndex) {
+            // Hide current card
+            const currentCardEl = document.getElementById(`card-${currentCard}`);
+            if (currentCardEl) {
+                currentCardEl.classList.remove('active');
+            }
+            
+            // Show new card
+            const newCardEl = document.getElementById(`card-${cardIndex}`);
+            if (newCardEl) {
+                newCardEl.classList.add('active');
+                currentCard = cardIndex;
+                createBurst();
+            }
+        }
+
+        function answerQuestion(questionNum, answer) {
+            if (answer) {
+                createBurst();
+                if (questionNum === 1) {
+                    showCard(2);
+                } else if (questionNum === 2) {
+                    showCard(4);
+                } else if (questionNum === 3) {
+                    showCard(6);
+                }
+            } else {
+                // Fun response for "no" answers
+                const questions = {
+                    1: "Are you sure? Think about it... 💭",
+                    2: "But adventures await! 🌍",
+                    3: "Give it another thought? 💕"
+                };
+                
+                const questionEl = document.getElementById(`question-${questionNum}`);
+                if (questionEl) {
+                    const originalText = questionEl.textContent;
+                    questionEl.textContent = questions[questionNum];
+                    questionEl.style.animation = 'none';
+                    questionEl.offsetHeight; // Trigger reflow
+                    questionEl.style.animation = 'fadeIn 0.5s ease-out';
+                    
+                    setTimeout(() => {
+                        questionEl.textContent = originalText;
+                    }, 2000);
+                }
+            }
+        }
+
+        function openPresent(presentNum) {
+            const present = document.getElementById(`present-${presentNum === 3 ? 'final' : presentNum}`);
+            const surprise = document.getElementById(`surprise-${presentNum}`);
+            
+            if (present && surprise) {
+                present.style.animation = 'presentOpen 0.3s ease-out forwards';
+                present.style.transform = 'scale(0)';
+                present.style.opacity = '0';
+                
+                setTimeout(() => {
+                    present.style.display = 'none';
+                    surprise.classList.add('active');
+                    createBurst();
+                    
+                    if (presentNum === 1) {
+                        setTimeout(() => showCard(3), 1000);
+                    } else if (presentNum === 2) {
+                        setTimeout(() => showCard(5), 1000);
+                    }
+                }, 300);
+            }
+        }
+
+        function restartStory() {
+            // Reset all cards
+            for (let i = 1; i <= 6; i++) {
+                const card = document.getElementById(`card-${i}`);
+                if (card) {
+                    card.classList.remove('active');
+                }
+            }
+            
+            // Reset presents
+            const presents = [
+                { id: 'present-1', surprise: 'surprise-1' },
+                { id: 'present-2', surprise: 'surprise-2' },
+                { id: 'present-final', surprise: 'surprise-3' }
+            ];
+            
+            presents.forEach(p => {
+                const present = document.getElementById(p.id);
+                const surprise = document.getElementById(p.surprise);
+                if (present) {
+                    present.style.display = 'block';
+                    present.style.animation = 'presentFloat 3s ease-in-out infinite';
+                    present.style.transform = '';
+                    present.style.opacity = '1';
+                }
+                if (surprise) {
+                    surprise.classList.remove('active');
+                }
+            });
+            
+            // Show first card
+            const firstCard = document.getElementById('card-0');
+            if (firstCard) {
+                firstCard.classList.add('active');
+                currentCard = 0;
+                createBurst();
+            }
+        }
+
+        // Particle Burst Effect - Optimized
+        function createBurst() {
+            const burstCount = 20;
+            for (let i = 0; i < burstCount; i++) {
+                setTimeout(() => {
+                    const burst = document.createElement('div');
+                    burst.textContent = ['❤️', '💕', '💖', '✨', '💗'][Math.floor(Math.random() * 5)];
+                    burst.style.position = 'fixed';
+                    burst.style.left = '50%';
+                    burst.style.top = '50%';
+                    burst.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                    burst.style.pointerEvents = 'none';
+                    burst.style.zIndex = '1000';
+                    burst.style.transition = 'all 0.8s ease-out';
+                    document.body.appendChild(burst);
+                    
+                    const angle = (Math.PI * 2 * i) / burstCount;
+                    const velocity = Math.random() * 150 + 80;
+                    const x = Math.cos(angle) * velocity;
+                    const y = Math.sin(angle) * velocity;
+                    
+                    requestAnimationFrame(() => {
+                        burst.style.transform = `translate(${x}px, ${y}px) scale(0)`;
+                        burst.style.opacity = '0';
+                    });
+                    
+                    setTimeout(() => burst.remove(), 800);
+                }, i * 15);
+            }
+        }
+
+        // Add present open animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes presentOpen {
+                0% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+                100% {
+                    transform: scale(0);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
