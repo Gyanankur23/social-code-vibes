@@ -1,5 +1,5 @@
 # 💅 Social Code Vibes
-
+ 
 A curated collection of interactive, visually stunning coding projects designed for social media sharing and engagement.
 
 ## 🎯 About
