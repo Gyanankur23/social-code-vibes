@@ -2,6 +2,7 @@
  
 A curated collection of interactive, visually stunning coding projects designed for social media sharing and engagement.
 
+
 ## 🎯 About
 
 This repository hosts creative, production-ready web projects that are perfect for:
