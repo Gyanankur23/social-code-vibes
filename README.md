@@ -49,7 +49,7 @@ An interactive 3D love story experience with particle effects, animations, and e
 
 All projects are deployed via Vercel for optimal performance and global CDN distribution.
 
-## 💡 Future Projects
+## 💡 Future Projects 
 
 This repo is designed to scale. Add more interactive projects without clutter - each project lives in its own directory.
 
